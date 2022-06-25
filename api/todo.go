@@ -102,16 +102,20 @@ func (t *TodoList) List() {
 		i += 1
 		task := blue(v.Task)
 		done := blue("no")
+		createAt := v.CreatedAt.Format(time.RFC822)
+		completedAt := v.CompletedAt.Format(time.RFC822)
 		if v.Done {
 			task = green(fmt.Sprintf("\u2705 %s", v.Task))
 			done = green("yes")
+			createAt = green(createAt)
+			completedAt = green(completedAt)
 		}
 		cells = append(cells, []*simpletable.Cell{
 			{Text: fmt.Sprintf("%d", i)},
 			{Text: task},
 			{Text: fmt.Sprintf("%s", done)},
-			{Text: v.CreatedAt.Format(time.RFC822)},
-			{Text: v.CompletedAt.Format(time.RFC822)},
+			{Text: createAt},
+			{Text: completedAt},
 		})
 	}
 

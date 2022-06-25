@@ -1,15 +1,11 @@
 package main
 
 import (
-	"bufio"
-	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"os"
-	"strings"
 
-	todo "github.com/gyu-young-park/what-to-do"
+	todo "github.com/gyu-young-park/what-to-do/api"
 )
 
 const (
@@ -33,61 +29,35 @@ func main() {
 
 	switch {
 	case *add:
-		task, err := getInput(os.Stdin, flag.Args()...)
+		task, err := GetInput(os.Stdin, flag.Args()...)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
+			ErrorReportAndSystemExit(err)
 		}
 		todoList.Add(task)
 		err = todoList.Store(TODO_FILE)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
+			ErrorReportAndSystemExit(err)
 		}
 	case *complete > 0:
 		err := todoList.Complete(*complete)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
+			ErrorReportAndSystemExit(err)
 		}
 		err = todoList.Store(TODO_FILE)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
+			ErrorReportAndSystemExit(err)
 		}
 	case *del > 0:
 		err := todoList.Delete(*del)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
+			ErrorReportAndSystemExit(err)
 		}
 
 		err = todoList.Store(TODO_FILE)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
+			ErrorReportAndSystemExit(err)
 		}
 	case *list:
 		todoList.List()
 	}
-}
-
-func getInput(r io.Reader, args ...string) (string, error) {
-	if len(args) > 0 {
-		return strings.Join(args, " "), nil
-	}
-
-	scanner := bufio.NewScanner(r)
-	scanner.Scan()
-	if err := scanner.Err(); err != nil {
-		return "", nil
-	}
-
-	text := scanner.Text()
-
-	if len(text) == 0 {
-		return "", errors.New("empty todo is not allowed")
-	}
-
-	return text, nil
 }
